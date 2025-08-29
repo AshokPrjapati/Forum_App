@@ -1,10 +1,7 @@
-import { useState, useEffect } from "react";
 import {
   Box,
   Flex,
   HStack,
-  useDisclosure,
-  useColorModeValue,
   Stack,
   Container,
   IconButton,
@@ -18,7 +15,6 @@ import {
   SearchIcon,
 } from "@chakra-ui/icons";
 import { FaHome } from "react-icons/fa";
-import { FiSearch } from "react-icons/fi";
 import UserProfile from "./UserProfile";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -26,6 +22,7 @@ import { RootState } from "../../Redux/store";
 import useToggle from "../../Custom-Hooks/useToggle";
 import SearchBar from "../Searchbar/SearchBar";
 import "./Navbar.css";
+
 const Links = [
   {
     name: "Home",

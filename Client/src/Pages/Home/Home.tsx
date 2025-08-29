@@ -1,5 +1,4 @@
 import { Box } from "@chakra-ui/react";
-import React from "react";
 import Navbar from "../../Components/Navbar/Navbar";
 import LeftCompo from "./LeftCompo";
 import RightCompo from "./RightCompo";
@@ -7,7 +6,7 @@ import Post from "../Post/Post";
 
 type Props = {};
 
-function Home({ }: Props) {
+function Home({}: Props) {
   return (
     <>
       <Navbar />
