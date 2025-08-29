@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import PageNotFound from "./Pages/Page404/PageNotFound";
 import SinglePostPage from "./Pages/Post/SinglePostPage";
@@ -11,25 +11,46 @@ const Profile = lazy(() => import("./Pages/Profile/Profile"));
 const Signup = lazy(() => import("./Pages/Auth/Login/Signup"));
 const Admin = lazy(() => import("./Admin/Pages/Home/Admin"));
 const VerifyEmail = lazy(() => import("./Pages/Auth/verification/VerifyEmail"));
-const OthersProfilePage = lazy(() => import("./Pages/Profile/OthersProfilePage"));
-const SendVerificationEmail = lazy(() => import("./Pages/Auth/verification/SendVerificationEmail"));
+const OthersProfilePage = lazy(
+  () => import("./Pages/Profile/OthersProfilePage")
+);
+const SendVerificationEmail = lazy(
+  () => import("./Pages/Auth/verification/SendVerificationEmail")
+);
 
 function Application() {
+  const authWrapper = (children: React.ReactNode) => {
+    return <RequiredRoute>{children}</RequiredRoute>;
+  };
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/post/:id" element={<><SinglePostPage /></>} />
-      <Route path="/user/:id" element={<RequiredRoute><OthersProfilePage /></RequiredRoute>} />
-      <Route path="/messages" element={<RequiredRoute><Home /></RequiredRoute>} />
-      <Route path="/notifications" element={<RequiredRoute><Home /></RequiredRoute>} />
-      <Route path="/profile" element={<RequiredRoute><Profile /></RequiredRoute>} />
-      <Route path="/sendverifyemail" element={<RequiredRoute><SendVerificationEmail /></RequiredRoute>} />
-      <Route path="/verifyemail" element={<RequiredRoute><VerifyEmail /></RequiredRoute>} />
-      <Route path="/admin/*" element={<RequiredRoute><Admin children={undefined} /></RequiredRoute>} />
-      <Route path="/follow/:id" element={<RequiredRoute><Follow /></RequiredRoute>} />
+      <Route
+        path="/post/:id"
+        element={
+          <>
+            <SinglePostPage />
+          </>
+        }
+      />
+      <Route path="/user/:id" element={authWrapper(<OthersProfilePage />)} />
+      <Route path="/messages" element={authWrapper(<Home />)} />
+      <Route path="/notifications" element={authWrapper(<Home />)} />
+      <Route path="/profile" element={authWrapper(<Profile />)} />
+      <Route
+        path="/sendverifyemail"
+        element={authWrapper(<SendVerificationEmail />)}
+      />
+      <Route path="/verifyemail" element={authWrapper(<VerifyEmail />)} />
+      <Route
+        path="/admin/*"
+        element={authWrapper(<Admin children={undefined} />)}
+      />
+      <Route path="/follow/:id" element={authWrapper(<Follow />)} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
