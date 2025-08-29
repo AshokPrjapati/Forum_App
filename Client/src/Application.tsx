@@ -29,14 +29,7 @@ function Application() {
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route
-        path="/post/:id"
-        element={
-          <>
-            <SinglePostPage />
-          </>
-        }
-      />
+      <Route path="/post/:id" element={<SinglePostPage />} />
       <Route path="/user/:id" element={authWrapper(<OthersProfilePage />)} />
       <Route path="/messages" element={authWrapper(<Home />)} />
       <Route path="/notifications" element={authWrapper(<Home />)} />
