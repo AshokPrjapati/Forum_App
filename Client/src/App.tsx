@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { getFollowing, getUser } from "./Redux/Auth/auth.actions";
 import UseToastMsg, { ToastType } from "./Custom-Hooks/Toast";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { postLikes } from "./Redux/Post/post.actions";
 import Loader from "./Components/Loader/Loader";
 import { RootState } from "./Redux/store";
