@@ -33,6 +33,7 @@ app.listen(port, async () => {
   try {
     await connectMongo();
     console.log("MongoDB is connected");
+    console.log(`Server is running at port ${port}`);
   } catch (error) {
     console.log("error: ", error);
   }
