@@ -49,13 +49,11 @@ async function UserRegisteration(req, res) {
 
     await user.save();
 
-    res
-      .status(201)
-      .json({
-        status: 200,
-        message: "registeration success",
-        credentials: user,
-      });
+    res.status(201).json({
+      status: 200,
+      message: "registration success",
+      credentials: user,
+    });
   } catch (error) {
     // console.log('error: ', error);
     res.send(error);
@@ -69,14 +67,12 @@ async function GoogleAuth(req, res) {
     const CheckUser = await UserModel.findOne({ email: payload.email });
     if (CheckUser) {
       const token = await CheckUser.getAuthorizationToken();
-      return res
-        .status(201)
-        .json({
-          status: 200,
-          message: "login success",
-          credentials: CheckUser,
-          token,
-        });
+      return res.status(201).json({
+        status: 200,
+        message: "login success",
+        credentials: CheckUser,
+        token,
+      });
     } else {
       const user = new UserModel({
         ...payload,
@@ -95,18 +91,19 @@ async function GoogleAuth(req, res) {
 
       await user.save();
 
-      res
-        .status(201)
-        .json({
-          status: 200,
-          message: "GoogleAuth success",
-          credentials: user,
-          token,
-        });
+      res.status(201).json({
+        status: 200,
+        message: "GoogleAuth success",
+        credentials: user,
+        token,
+      });
     }
   } catch (error) {
     console.log("error: ", error);
-    res.status(500).send(error);
+    res.status(500).json({
+      status: 200,
+      message: "GoogleAuth failed",
+    });
   }
 }
 
@@ -119,14 +116,12 @@ async function UserLogin(req, res) {
       const isMatched = await bcrypt.compare(password, user.password);
       if (isMatched) {
         const token = await user.getAuthorizationToken();
-        res
-          .status(201)
-          .json({
-            status: 200,
-            message: "Login Success",
-            credentials: user,
-            token,
-          });
+        res.status(201).json({
+          status: 200,
+          message: "Login Success",
+          credentials: user,
+          token,
+        });
       } else {
         res.status(201).json({ status: 401, message: "password not matched" });
       }
@@ -220,14 +215,12 @@ async function verifyEmail(req, res) {
         if (user.password == decode.password) {
           user.isVerified = true;
           const token = await user.getAuthorizationToken();
-          return res
-            .status(201)
-            .json({
-              status: 200,
-              message: "Email has been verified",
-              credentials: user,
-              token,
-            });
+          return res.status(201).json({
+            status: 200,
+            message: "Email has been verified",
+            credentials: user,
+            token,
+          });
         } else {
           return res
             .status(201)
@@ -257,13 +250,11 @@ async function UpdateUser(req, res) {
     let user = await UserModel.findOne({ _id });
     Object.assign(user, payload);
     await user.save();
-    return res
-      .status(201)
-      .json({
-        status: 200,
-        message: "user has been updated",
-        credentials: user,
-      });
+    return res.status(201).json({
+      status: 200,
+      message: "user has been updated",
+      credentials: user,
+    });
   } catch (error) {
     console.log("error: ", error);
     return res.status(201).json({ status: 401, error: error.message });
@@ -293,13 +284,11 @@ async function UpdatePassword(req, res) {
     let user = await UserModel.findById(_id);
     user.password = password;
     await user.save();
-    return res
-      .status(201)
-      .json({
-        status: 200,
-        message: "Password has been updated",
-        credentials: user,
-      });
+    return res.status(201).json({
+      status: 200,
+      message: "Password has been updated",
+      credentials: user,
+    });
   } catch (error) {
     console.log("error: ", error);
     return res.status(201).json({ status: 401, error: error.message });
@@ -357,13 +346,11 @@ async function UnFollowUser(req, res) {
     targetUser.followerCount--;
     await targetUser.save();
 
-    return res
-      .status(201)
-      .json({
-        status: 200,
-        message: "Unfollowed the user.",
-        credentials: user,
-      });
+    return res.status(201).json({
+      status: 200,
+      message: "Unfollowed the user.",
+      credentials: user,
+    });
   } catch (error) {
     console.log("error: ", error);
     return res.status(201).json({ status: 401, error: error.message });
