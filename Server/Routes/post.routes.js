@@ -1,7 +1,8 @@
 const express = require("express");
 const PostRouter = express.Router();
-const post_controller = require("../Controllers/post.controller")
+const post_controller = require("../Controllers/post.controller");
 
+// ================== Post ==================== //
 PostRouter.get("/", post_controller.PostRouterHome);
 
 PostRouter.get("/all", post_controller.AllPost);
@@ -24,9 +25,7 @@ PostRouter.post("/:id/unlike", post_controller.UnLikePost);
 
 PostRouter.get("/:id/postlikes", post_controller.GetPostLikes);
 
-
-// ? Comments
-
+// ================== Comments ==================== //
 
 PostRouter.get("/:id/comments", post_controller.SinglePostComment);
 
@@ -37,6 +36,5 @@ PostRouter.delete("/comment/delete/:id", post_controller.DeleteComment);
 PostRouter.post("/comment/new", post_controller.CreateComment);
 
 PostRouter.post("/comment/newreply", post_controller.CreateCommentReply);
-
 
 module.exports = { PostRouter };
