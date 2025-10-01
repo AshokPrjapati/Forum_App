@@ -24,6 +24,7 @@ import { MdUpload } from "react-icons/md";
 import { Input } from "@chakra-ui/input";
 import { Dispatch } from "redux";
 import "./createpost.modules.css";
+import UploadImage from "./UploadImage";
 
 type props = {
   onClose(): void;
@@ -32,17 +33,16 @@ type props = {
 function CreatePost({ onClose }: props) {
   const titleRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
-  const [ImageFile, setImageFile] = useState<any>([]);
+  const [imageFile, setImageFile] = useState<any>(null);
   const [Error, setError] = useState<boolean>(false);
   const dispatch: Dispatch<any> = useDispatch();
   const { userCredential } = useSelector((store: RootState) => store.auth);
-  const { loading } = useSelector((store: RootState) => store.post);
 
   const onCreatePost = () => {
     if (
       !titleRef.current?.value ||
       !descRef.current?.value ||
-      !ImageFile.length
+      !imageFile.length
     ) {
       return setError(true);
     } else {
@@ -50,7 +50,7 @@ function CreatePost({ onClose }: props) {
     }
 
     const form = new FormData();
-    form.append("file", ImageFile[0]);
+    form.append("file", imageFile[0]);
     form.append("upload_preset", "sfunzr0m");
     form.append("cloud_name", "dpzbtnmfl");
 
@@ -79,7 +79,7 @@ function CreatePost({ onClose }: props) {
   const renderFileUploadSection = () => {
     return (
       <>
-        {ImageFile && ImageFile.length ? (
+        {imageFile && imageFile.length ? (
           <Flex
             align={"center"}
             justify="space-between"
@@ -145,7 +145,12 @@ function CreatePost({ onClose }: props) {
           <ModalCloseButton />
           <ModalBody pb={2}>
             <Stack spacing={"10px"}>
-              {renderFileUploadSection()}
+              <UploadImage
+                imageFile={imageFile}
+                updateImageFile={(files: FileList | null) =>
+                  setImageFile(files)
+                }
+              />
               {renderPostInputSection()}
             </Stack>
             {Error && (
