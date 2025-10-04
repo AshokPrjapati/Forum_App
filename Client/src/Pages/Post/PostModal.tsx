@@ -27,6 +27,7 @@ import { Dispatch } from "redux";
 import "./createpost.modules.css";
 import UploadImage from "./UploadImage";
 import { IPost } from "../../Constants/constant";
+import { POST_LOADING } from "../../Redux/Post/post.actionType";
 
 interface PostModalProps {
   onClose(): void;
@@ -43,6 +44,7 @@ function PostModal({ onClose, mode, post }: PostModalProps) {
   const [error, setError] = useState<boolean>(false);
   const dispatch: Dispatch<any> = useDispatch();
   const { userCredential } = useSelector((store: RootState) => store.auth);
+  const { loading } = useSelector((store: RootState) => store.post);
 
   // Initialize form values for update mode
   useEffect(() => {
@@ -87,7 +89,7 @@ function PostModal({ onClose, mode, post }: PostModalProps) {
     form.append("file", imageFile[0]);
     form.append("upload_preset", "sfunzr0m");
     form.append("cloud_name", "dpzbtnmfl");
-
+    dispatch({ type: POST_LOADING });
     fetch("https://api.cloudinary.com/v1_1/dpzbtnmfl/image/upload", {
       method: "POST",
       body: form,
@@ -198,6 +200,7 @@ function PostModal({ onClose, mode, post }: PostModalProps) {
               _hover={{ bg: "#307eff" }}
               bg="#025bee"
               mr={3}
+              isLoading={loading}
             >
               {getButtonText()}
             </Button>
