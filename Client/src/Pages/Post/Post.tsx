@@ -8,7 +8,7 @@ import useToggle from "../../Custom-Hooks/useToggle";
 import { getAllPost } from "../../Redux/Post/post.actions";
 import { RootState } from "../../Redux/store";
 import { Dispatch } from "redux";
-import CreatePost from "./Createpost";
+import PostModal from "./PostModal";
 
 function Post() {
   const navigate = useNavigate();
@@ -88,7 +88,7 @@ function Post() {
           </Button>
         </Flex>
 
-        {isOpen && <CreatePost onClose={onClose} />}
+        {isOpen && <PostModal mode="create" onClose={onClose} />}
       </Box>
       <Grid gap="10px" minH="fit-content">
         {posts &&
