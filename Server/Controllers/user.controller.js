@@ -181,10 +181,7 @@ async function sentVerificationEmail(req, res) {
       from: process.env.EMAIL,
       to: email,
       subject: "sent verification mail",
-      html: Email_template(
-        "https://forumapp-120fb.web.app/verifyemail",
-        EncryptedCredential
-      ),
+      html: Email_template(process.env.EMAIL_REDIRECT_URL, EncryptedCredential),
     };
 
     transporter.sendMail(mailOptions, (err, info) => {

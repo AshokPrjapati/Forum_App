@@ -1,4 +1,3 @@
-
 const Email_template = (URL, CREDENTIAL) => `
 <!doctype html>
                <html ⚡4email data-css-strict>
@@ -309,7 +308,6 @@ const Email_template = (URL, CREDENTIAL) => `
                </body>
                
                </html>
-`
+`;
 
-
-module.exports = { Email_template } 
+module.exports = { Email_template };

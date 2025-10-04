@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Button, Container, Heading, Stack, Text } from "@chakra-ui/react";
 import "./verify.modules.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,9 +22,8 @@ const SendVerificationEmail = () => {
       return Toast("Email or password is missing", Type.info);
     }
     dispatch(sendVerifyEmail(email, password, Toast));
-    setSuccess(true)
+    setSuccess(true);
   };
-
 
   return (
     <Stack h="100vh" justifyContent={"center"} alignItems="center">
@@ -42,14 +41,24 @@ const SendVerificationEmail = () => {
               <Heading id="verifyh1">Verify Your Email Address</Heading>
               <p>Please verify the email by clicking the button below</p>
               <Box>
-                {success ?
-                  <Button bg={"green.400"} color={"white"} _hover={{ bg: "green.600", color: "white" }}>
+                {success ? (
+                  <Button
+                    bg={"green.400"}
+                    color={"white"}
+                    _hover={{ bg: "green.600", color: "white" }}
+                  >
                     Email has been sent
                   </Button>
-                  :
-                  <Button bg={"orange"} color={"white"} _hover={{ bg: "#ff6703", color: "white" }} onClick={handleVerify}>
+                ) : (
+                  <Button
+                    bg={"orange"}
+                    color={"white"}
+                    _hover={{ bg: "#ff6703", color: "white" }}
+                    onClick={handleVerify}
+                  >
                     Send Verification Email
-                  </Button>}
+                  </Button>
+                )}
               </Box>
               <Text color={"gray.500"} fontSize={{ base: "sm", sm: "md" }}>
                 We're looking for amazing personality just like you! Become a
