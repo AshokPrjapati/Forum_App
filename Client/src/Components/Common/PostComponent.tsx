@@ -25,7 +25,7 @@ import { MdPublic } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import useToggle from "../../Custom-Hooks/useToggle";
 import PostModal from "../../Pages/Post/PostModal";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import useCopyToClipboard from "../../Custom-Hooks/useCopyToClipboard";
 import "../Cards/PostCards/PostCard.css";
 import "./PostComponent.css";
@@ -77,6 +77,25 @@ function PostComponent({
   // State for text expansion and image full screen
   const [expanded, setExpanded] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMenu]);
 
   const handleLikeToggle = () => {
     if (IsLikedPost) {
@@ -84,6 +103,22 @@ function PostComponent({
     } else {
       onLikePost?.();
     }
+  };
+
+  const handleMenuToggle = () => {
+    setShowMenu(!showMenu);
+  };
+
+  const handleSavePost = () => {
+    // TODO: Implement save post functionality
+    console.log("Save post clicked");
+    setShowMenu(false);
+  };
+
+  const handleReportPost = () => {
+    // TODO: Implement report post functionality
+    console.log("Report post clicked");
+    setShowMenu(false);
   };
 
   // Truncate description for "read more" functionality
@@ -96,7 +131,7 @@ function PostComponent({
 
   const renderPostMenu = () => {
     return (
-      <Box position="relative" flexShrink={0}>
+      <Box position="relative" flexShrink={0} ref={menuRef}>
         <IconButton
           aria-label="More options"
           icon={<BsThreeDots />}
@@ -108,91 +143,93 @@ function PostComponent({
             bg: "gray.100",
             color: "gray.700",
           }}
-          onClick={() => {}}
+          onClick={handleMenuToggle}
         />
 
         {/* Dropdown Menu */}
-        <Box
-          position="absolute"
-          top="100%"
-          right={0}
-          bg="white"
-          boxShadow="xl"
-          borderRadius="lg"
-          border="1px solid"
-          borderColor="gray.200"
-          minW="180px"
-          py={2}
-          zIndex={10}
-          opacity={0}
-          visibility="hidden"
-          transform="translateY(-8px)"
-          transition="all 0.2s"
-          _groupHover={{
-            opacity: 1,
-            visibility: "visible",
-            transform: "translateY(0)",
-          }}
-        >
-          <VStack spacing={0} align="stretch">
-            <Button
-              variant="ghost"
-              size="sm"
-              justifyContent="flex-start"
-              fontWeight="500"
-              px={4}
-              py={3}
-              borderRadius={0}
-              _hover={{ bg: "gray.50" }}
-            >
-              Save post
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              justifyContent="flex-start"
-              fontWeight="500"
-              px={4}
-              py={3}
-              borderRadius={0}
-              _hover={{ bg: "gray.50" }}
-            >
-              Report post
-            </Button>
-            {post?.authorID === userCredential._id && (
-              <>
-                <Box as="hr" borderColor="gray.200" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  justifyContent="flex-start"
-                  fontWeight="500"
-                  px={4}
-                  py={3}
-                  borderRadius={0}
-                  _hover={{ bg: "gray.50" }}
-                  onClick={onOpen}
-                >
-                  Edit post
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  justifyContent="flex-start"
-                  fontWeight="500"
-                  px={4}
-                  py={3}
-                  borderRadius={0}
-                  color="red.500"
-                  _hover={{ bg: "red.50" }}
-                  onClick={onDeletePost}
-                >
-                  Delete post
-                </Button>
-              </>
-            )}
-          </VStack>
-        </Box>
+        {showMenu && (
+          <Box
+            position="absolute"
+            top="100%"
+            right={0}
+            bg="white"
+            boxShadow="xl"
+            borderRadius="lg"
+            border="1px solid"
+            borderColor="gray.200"
+            minW="180px"
+            py={2}
+            zIndex={10}
+            transform="translateY(4px)"
+          >
+            <VStack spacing={0} align="stretch">
+              <Button
+                variant="ghost"
+                size="sm"
+                justifyContent="flex-start"
+                fontWeight="500"
+                px={4}
+                py={3}
+                borderRadius={0}
+                _hover={{ bg: "gray.50" }}
+                onClick={handleSavePost}
+              >
+                Save post
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                justifyContent="flex-start"
+                fontWeight="500"
+                px={4}
+                py={3}
+                borderRadius={0}
+                _hover={{ bg: "gray.50" }}
+                onClick={handleReportPost}
+              >
+                Report post
+              </Button>
+              {post?.authorID === userCredential._id && (
+                <>
+                  <Box as="hr" borderColor="gray.200" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    justifyContent="flex-start"
+                    fontWeight="500"
+                    px={4}
+                    py={3}
+                    borderRadius={0}
+                    _hover={{ bg: "gray.50" }}
+                    onClick={() => {
+                      onOpen();
+                      setShowMenu(false);
+                    }}
+                  >
+                    Edit post
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    justifyContent="flex-start"
+                    fontWeight="500"
+                    px={4}
+                    py={3}
+                    borderRadius={0}
+                    color="red.500"
+                    _hover={{ bg: "red.50" }}
+                    onClick={() => {
+                      onDeletePost?.();
+                      setShowMenu(false);
+                    }}
+                  >
+                    Delete post
+                  </Button>
+                </>
+              )}
+            </VStack>
+          </Box>
+        )}
       </Box>
     );
   };
