@@ -5,20 +5,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import UseToastMsg from "../../../Custom-Hooks/Toast";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { verifyemail } from "../../../Redux/Auth/auth.actions";
-
-type Props = {};
+import { verifyEmail } from "../../../Redux/Auth/auth.actions";
 
 function VerifyEmail() {
   const dispatch: Dispatch<any> = useDispatch();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const credential = searchParams.get("credential");
-  const { Toast, Type } = UseToastMsg();
+  const { Toast } = UseToastMsg();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (credential) {
-      dispatch(verifyemail(credential, Toast, navigate));
+      dispatch(verifyEmail(credential, Toast, navigate));
     }
   }, [credential]);
 

@@ -1,8 +1,6 @@
-import React from "react";
 import { ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { IUser } from "./Constants/constant";
+import { Navigate, useLocation } from "react-router-dom";
 import { RootState } from "./Redux/store";
 
 interface IChildren {
@@ -10,22 +8,22 @@ interface IChildren {
 }
 
 function RequiredRoute({ children }: IChildren) {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
   var user = sessionStorage.getItem("user");
   let data = user ? JSON.parse(user) : null;
   const { userCredential } = useSelector((store: RootState) => store.auth);
+  const isEmailVerified = userCredential.isVerified;
 
   if (data == null) {
-    return <Navigate to={"/login"} />
+    return <Navigate to={"/login"} />;
   }
 
-  if (!userCredential.isVerified && location.pathname != '/sendverifyemail') {
-    return <Navigate to={"/sendverifyemail"} />
+  if (!isEmailVerified && pathname != "/sendverifyemail") {
+    return <Navigate to={"/sendverifyemail"} />;
   }
 
-  if (location.pathname == '/sendverifyemail' && userCredential.isVerified) {
-    return <Navigate to={'/'} />
+  if (pathname == "/sendverifyemail" && isEmailVerified) {
+    return <Navigate to={"/"} />;
   }
 
   return <>{children}</>;

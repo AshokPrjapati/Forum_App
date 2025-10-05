@@ -38,7 +38,7 @@ function Application() {
         path="/sendverifyemail"
         element={authWrapper(<SendVerificationEmail />)}
       />
-      <Route path="/verifyemail" element={authWrapper(<VerifyEmail />)} />
+      <Route path="/verifyemail" element={<VerifyEmail />} />
       <Route
         path="/admin/*"
         element={authWrapper(<Admin children={undefined} />)}
