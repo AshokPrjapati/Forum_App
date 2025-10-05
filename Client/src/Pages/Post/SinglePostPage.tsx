@@ -169,16 +169,210 @@ function SinglePostPage({}: Props) {
     dispatch(postLikes(userCredential._id));
   }, [id]);
 
-  if (loading) {
-    return <Loader />;
-  }
+  const renderFooter = () => {
+    return (
+      <Flex as="footer" p="1" className="post-footer">
+        <Flex
+          className="user-select-reject"
+          tabIndex={0}
+          color={IsLikedPost(post._id) ? "blue.400" : ""}
+          onClick={IsLikedPost(post._id) ? UnLikePost : LikePost}
+          align={"center"}
+          gap="5px"
+          flex={1}
+          justify="center"
+          p="2"
+        >
+          <Text>{IsLikedPost(post._id) ? <AiFillLike /> : <BiLike />}</Text>
+          <Text>
+            <span>{post.likes}</span> Like
+          </Text>
+        </Flex>
+        <Flex
+          className="user-select-reject"
+          onClick={() => setShowComments((v) => !v)}
+          align={"center"}
+          gap="5px"
+          flex={1}
+          justify="center"
+          p="2"
+        >
+          <Text>
+            <BiCommentDots />
+          </Text>
+          <Text>Comment</Text>
+        </Flex>
+        <Flex
+          color={success ? "green.500" : ""}
+          onClick={() =>
+            copyToClipboard(
+              `${import.meta.env.VITE_WEBSITE_URL}/post/${post?._id}`
+            )
+          }
+          className="user-select-reject"
+          align={"center"}
+          gap="5px"
+          flex={1}
+          justify="center"
+          p="2"
+        >
+          <Text>{success ? <IoCheckmarkDoneSharp /> : <FaShare />}</Text>
+          <Text>{success ? "Copied" : "Share"}</Text>
+        </Flex>
+      </Flex>
+    );
+  };
 
-  return (
-    post &&
-    true && (
+  const renderComments = () => {
+    const { RootComments } = FinalPostComments;
+    if (!RootComments) return null;
+    return (
+      <Box as="section" className="comments-container">
+        <CommentForm autoFocus={true} onSubmit={onCreateComment} />
+
+        {RootComments.length > 0 && (
+          <CommentsList
+            comments={FinalPostComments.RootComments}
+            replies={FinalPostComments.Replies}
+          />
+        )}
+      </Box>
+    );
+  };
+
+  const renderPostContent = () => {
+    return (
+      <Box as="section" className="post-main">
+        <Box className="">
+          <Text className="post-content-title">{post.title}</Text>
+          <Text className="">{post.description}</Text>
+        </Box>
+        <Box className="post-content-image">
+          <Image src={post?.content} />
+        </Box>
+      </Box>
+    );
+  };
+
+  const renderPostMenu = () => {
+    return (
+      <Box className="post-options-menu">
+        <Box className="hamberger-menu">
+          <Text></Text>
+          <Text></Text>
+          <Text></Text>
+        </Box>
+        <Box className="post-options-list">
+          <UnorderedList fontWeight={"semibold"}>
+            <ListItem>Report</ListItem>
+            {post?.authorID == userCredential?._id && (
+              <>
+                <ListItem className="edit-btn">
+                  <Button
+                    w="100%"
+                    h="100%"
+                    p=".5em"
+                    pl=".75em"
+                    variant={"unstyled"}
+                    textAlign="left"
+                    onClick={onOpen}
+                  >
+                    Edit
+                  </Button>
+                </ListItem>
+                <ListItem onClick={DeletePost}>Delete</ListItem>
+              </>
+            )}
+            <ListItem>Save</ListItem>
+          </UnorderedList>
+        </Box>
+      </Box>
+    );
+  };
+
+  const renderPostHeader = () => {
+    return (
+      <Flex as="header" gap="10px" pb="2">
+        <Flex gap="10px" as={Link} to={`/user/${post.authorID}`}>
+          <Box className={post.author?.online ? "online" : "offline"}>
+            <Box className="post-header-image">
+              <Image src={post.author?.photoURL || "https://bit.ly/3kkJrly"} />
+            </Box>
+          </Box>
+          <Box className="post-header-details">
+            <Flex align={"center"} gap="10px">
+              <Text
+                whiteSpace={"nowrap"}
+                textTransform={"capitalize"}
+                _hover={{ textDecor: "underline" }}
+              >
+                {post.author?.username}
+              </Text>
+              {post.author?.online ? (
+                <Box
+                  fontSize={".7em"}
+                  color={"green"}
+                  display={"flex"}
+                  justifyContent="center"
+                  alignItems={"center"}
+                  gap="2"
+                  borderRadius="10px"
+                >
+                  <Box bg="green" borderRadius={"50%"} h="7px" w="7px"></Box>
+                  <Text fontWeight={"500"}>Online</Text>
+                </Box>
+              ) : (
+                <Box
+                  fontSize={".7em"}
+                  color={"gray"}
+                  display={"flex"}
+                  justifyContent="center"
+                  alignItems={"center"}
+                  gap="2"
+                  borderRadius="10px"
+                >
+                  <Box bg="gray" borderRadius={"50%"} h="7px" w="7px"></Box>
+                  <Text fontWeight={"500"}>Offline</Text>
+                </Box>
+              )}
+            </Flex>
+            <Text
+              textTransform={"capitalize"}
+              fontWeight={"semibold"}
+              color="gray.600"
+            >
+              {post.author?.bio || post.author?.email}
+            </Text>
+            <Text fontWeight={"semibold"} color="gray.500">
+              {post?.createdAt && (
+                <Text as="span">{CalcTime(post?.createdAt)}</Text>
+              )}
+              <Text as="span" ml="3">
+                {post.edited ? "• Edited" : ""}
+              </Text>
+            </Text>
+          </Box>
+        </Flex>
+        <Flex ml={"auto"} align="center" gap="10px">
+          {IsFollowing(post?.authorID) &&
+            userCredential._id !== post?.authorID && (
+              <Button variant={"outline"} onClick={FollowUser}>
+                + Follow
+              </Button>
+            )}
+          {renderPostMenu()}
+        </Flex>
+      </Flex>
+    );
+  };
+
+  const renderMain = () => {
+    if (!post) return;
+    if (loading) return <Loader />;
+
+    return (
       <>
         <Navbar />
-        {isOpen && <PostModal mode="update" post={post} onClose={onClose} />}
         <Box
           as="article"
           p="2"
@@ -190,197 +384,25 @@ function SinglePostPage({}: Props) {
           m="auto"
           my="50px"
         >
-          <Flex as="header" gap="10px" pb="2">
-            <Flex gap="10px" as={Link} to={`/user/${post.authorID}`}>
-              <Box className={post.author?.online ? "online" : "offline"}>
-                <Box className="post-header-image">
-                  <Image
-                    src={post.author?.photoURL || "https://bit.ly/3kkJrly"}
-                  />
-                </Box>
-              </Box>
-              <Box className="post-header-details">
-                <Flex align={"center"} gap="10px">
-                  <Text
-                    whiteSpace={"nowrap"}
-                    textTransform={"capitalize"}
-                    _hover={{ textDecor: "underline" }}
-                  >
-                    {post.author?.username}
-                  </Text>
-                  {post.author?.online ? (
-                    <Box
-                      fontSize={".7em"}
-                      color={"green"}
-                      display={"flex"}
-                      justifyContent="center"
-                      alignItems={"center"}
-                      gap="2"
-                      borderRadius="10px"
-                    >
-                      <Box
-                        bg="green"
-                        borderRadius={"50%"}
-                        h="7px"
-                        w="7px"
-                      ></Box>
-                      <Text fontWeight={"500"}>Online</Text>
-                    </Box>
-                  ) : (
-                    <Box
-                      fontSize={".7em"}
-                      color={"gray"}
-                      display={"flex"}
-                      justifyContent="center"
-                      alignItems={"center"}
-                      gap="2"
-                      borderRadius="10px"
-                    >
-                      <Box bg="gray" borderRadius={"50%"} h="7px" w="7px"></Box>
-                      <Text fontWeight={"500"}>Offline</Text>
-                    </Box>
-                  )}
-                </Flex>
-                <Text
-                  textTransform={"capitalize"}
-                  fontWeight={"semibold"}
-                  color="gray.600"
-                >
-                  {post.author?.bio || post.author?.email}
-                </Text>
-                <Text fontWeight={"semibold"} color="gray.500">
-                  {post?.createdAt && (
-                    <Text as="span">{CalcTime(post?.createdAt)}</Text>
-                  )}
-                  <Text as="span" ml="3">
-                    {post.edited ? "• Edited" : ""}
-                  </Text>
-                </Text>
-              </Box>
-            </Flex>
-            <Flex ml={"auto"} align="center" gap="10px">
-              {IsFollowing(post?.authorID) &&
-                userCredential._id !== post?.authorID && (
-                  <Button variant={"outline"} onClick={FollowUser}>
-                    + Follow
-                  </Button>
-                )}
-              <Box className="post-options-menu">
-                <Box className="hamberger-menu">
-                  <Text></Text>
-                  <Text></Text>
-                  <Text></Text>
-                </Box>
-                <Box className="post-options-list">
-                  <UnorderedList fontWeight={"semibold"}>
-                    <ListItem>Report</ListItem>
-                    {post?.authorID == userCredential?._id && (
-                      <>
-                        <ListItem className="edit-btn">
-                          <Button
-                            w="100%"
-                            h="100%"
-                            p=".5em"
-                            pl=".75em"
-                            variant={"unstyled"}
-                            textAlign="left"
-                            onClick={onOpen}
-                          >
-                            Edit
-                          </Button>
-                        </ListItem>
-                        <ListItem onClick={DeletePost}>Delete</ListItem>
-                      </>
-                    )}
-                    <ListItem>Save</ListItem>
-                  </UnorderedList>
-                </Box>
-              </Box>
-            </Flex>
-          </Flex>
-
+          {renderPostHeader()}
           <hr />
 
-          <Box as="section" className="post-main">
-            <Box className="">
-              <Text className="post-content-title">{post.title}</Text>
-              <Text className="">{post.description}</Text>
-            </Box>
-            <Box className="post-content-image">
-              <Image src={post?.content} />
-            </Box>
-          </Box>
-
+          {renderPostContent()}
+          <hr style={{ margin: "5px 0" }} />
+          {renderFooter()}
           <hr style={{ margin: "5px 0" }} />
 
-          <Flex as="footer" p="1" className="post-footer">
-            <Flex
-              className="user-select-reject"
-              tabIndex={0}
-              color={IsLikedPost(post._id) ? "blue.400" : ""}
-              onClick={IsLikedPost(post._id) ? UnLikePost : LikePost}
-              align={"center"}
-              gap="5px"
-              flex={1}
-              justify="center"
-              p="2"
-            >
-              <Text>{IsLikedPost(post._id) ? <AiFillLike /> : <BiLike />}</Text>
-              <Text>
-                <span>{post.likes}</span> Like
-              </Text>
-            </Flex>
-            <Flex
-              className="user-select-reject"
-              onClick={() => setShowComments((v) => !v)}
-              align={"center"}
-              gap="5px"
-              flex={1}
-              justify="center"
-              p="2"
-            >
-              <Text>
-                <BiCommentDots />
-              </Text>
-              <Text>Comment</Text>
-            </Flex>
-            <Flex
-              color={success ? "green.500" : ""}
-              onClick={() =>
-                copyToClipboard(
-                  `https://forumapp-120fb.web.app/post/${post?._id}`
-                )
-              }
-              className="user-select-reject"
-              align={"center"}
-              gap="5px"
-              flex={1}
-              justify="center"
-              p="2"
-            >
-              <Text>{success ? <IoCheckmarkDoneSharp /> : <FaShare />}</Text>
-              <Text>{success ? "Copied" : "Share"}</Text>
-            </Flex>
-          </Flex>
-
-          <hr style={{ margin: "5px 0" }} />
-
-          {showComments && (
-            <Box as="section" className="comments-container">
-              <CommentForm autoFocus={true} onSubmit={onCreateComment} />
-
-              {FinalPostComments?.RootComments != null &&
-                FinalPostComments?.RootComments.length > 0 && (
-                  <CommentsList
-                    comments={FinalPostComments.RootComments}
-                    replies={FinalPostComments.Replies}
-                  />
-                )}
-            </Box>
-          )}
+          {showComments && renderComments()}
         </Box>
       </>
-    )
+    );
+  };
+
+  return (
+    <>
+      {renderMain()}
+      {isOpen && <PostModal mode="update" post={post} onClose={onClose} />}
+    </>
   );
 }
 

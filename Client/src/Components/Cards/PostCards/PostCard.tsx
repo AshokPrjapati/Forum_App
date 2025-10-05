@@ -258,7 +258,9 @@ function PostCard({ post, IsLikedPost, IsFollowing }: Props) {
         <Flex
           color={success ? "green.500" : ""}
           onClick={() =>
-            copyToClipboard(`https://forumapp-120fb.web.app/post/${post?._id}`)
+            copyToClipboard(
+              `${import.meta.env.VITE_WEBSITE_URL}/post/${post?._id}`
+            )
           }
           className="user-select-reject"
           align={"center"}
