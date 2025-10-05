@@ -114,11 +114,27 @@ async function DeletePost(req, res) {
   const id = req.params.id;
   try {
     const post = await PostModel.findById(id);
-    await post.removeRecords();
-    res.status(201).json({ status: 200, message: "Post has been deleted." });
+
+    if (!post) {
+      return res.status(404).json({
+        status: 404,
+        message: "Post not found.",
+      });
+    }
+
+    const result = await post.removeRecords();
+    res.status(200).json({
+      status: 200,
+      message: "Post has been deleted successfully.",
+      data: result,
+    });
   } catch (error) {
     console.log("error: ", error);
-    res.send(error);
+    res.status(500).json({
+      status: 500,
+      message: "Failed to delete post.",
+      error: error.message,
+    });
   }
 }
 

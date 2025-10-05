@@ -130,16 +130,32 @@ const LikesSchema = Schema({
   },
 });
 
-PostSchema.methods.removeRecords = async function (next) {
+PostSchema.methods.removeRecords = async function () {
   try {
     const postID = this._id;
 
-    await PostModel.deleteOne({ postID: postID });
+    // First, find all comments for this post
+    const comments = await CommentModel.find({ postID: postID });
+    const commentIds = comments.map((comment) => comment._id);
+
+    // Delete all comment likes for comments in this post
+    if (commentIds.length > 0) {
+      await CommentLikeModel.deleteMany({ commentID: { $in: commentIds } });
+    }
+
+    // Delete all comments for this post
     await CommentModel.deleteMany({ postID: postID });
-    await CommentLikeModel.deleteMany({ postID: postID });
+
+    // Delete all post likes
     await LikesModel.deleteMany({ postID: postID });
 
-    next();
+    // Finally, delete the post itself
+    await PostModel.deleteOne({ _id: postID });
+
+    return {
+      success: true,
+      message: "Post and related records deleted successfully",
+    };
   } catch (error) {
     console.log("error: ", error);
   }
@@ -147,10 +163,24 @@ PostSchema.methods.removeRecords = async function (next) {
 
 CommentSchema.methods.removeRecords = async function () {
   try {
-    await CommentModel.findByIdAndDelete(this._id);
-    await CommentModel.deleteMany({ parentID: this._id });
+    const commentID = this._id;
+
+    // Delete all likes for this comment
+    await CommentLikeModel.deleteMany({ commentID: commentID });
+
+    // Delete all child comments (replies)
+    await CommentModel.deleteMany({ parentID: commentID });
+
+    // Finally, delete the comment itself
+    await CommentModel.findByIdAndDelete(commentID);
+
+    return {
+      success: true,
+      message: "Comment and related records deleted successfully",
+    };
   } catch (error) {
     console.log("error: ", error);
+    throw error;
   }
 };
 
