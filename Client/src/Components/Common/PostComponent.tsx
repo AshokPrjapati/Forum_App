@@ -94,6 +94,109 @@ function PostComponent({
       : post.description;
   }, [post.description]);
 
+  const renderPostMenu = () => {
+    return (
+      <Box position="relative" flexShrink={0}>
+        <IconButton
+          aria-label="More options"
+          icon={<BsThreeDots />}
+          variant="ghost"
+          size="sm"
+          borderRadius="full"
+          color="gray.500"
+          _hover={{
+            bg: "gray.100",
+            color: "gray.700",
+          }}
+          onClick={() => {}}
+        />
+
+        {/* Dropdown Menu */}
+        <Box
+          position="absolute"
+          top="100%"
+          right={0}
+          bg="white"
+          boxShadow="xl"
+          borderRadius="lg"
+          border="1px solid"
+          borderColor="gray.200"
+          minW="180px"
+          py={2}
+          zIndex={10}
+          opacity={0}
+          visibility="hidden"
+          transform="translateY(-8px)"
+          transition="all 0.2s"
+          _groupHover={{
+            opacity: 1,
+            visibility: "visible",
+            transform: "translateY(0)",
+          }}
+        >
+          <VStack spacing={0} align="stretch">
+            <Button
+              variant="ghost"
+              size="sm"
+              justifyContent="flex-start"
+              fontWeight="500"
+              px={4}
+              py={3}
+              borderRadius={0}
+              _hover={{ bg: "gray.50" }}
+            >
+              Save post
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              justifyContent="flex-start"
+              fontWeight="500"
+              px={4}
+              py={3}
+              borderRadius={0}
+              _hover={{ bg: "gray.50" }}
+            >
+              Report post
+            </Button>
+            {post?.authorID === userCredential._id && (
+              <>
+                <Box as="hr" borderColor="gray.200" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  justifyContent="flex-start"
+                  fontWeight="500"
+                  px={4}
+                  py={3}
+                  borderRadius={0}
+                  _hover={{ bg: "gray.50" }}
+                  onClick={onOpen}
+                >
+                  Edit post
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  justifyContent="flex-start"
+                  fontWeight="500"
+                  px={4}
+                  py={3}
+                  borderRadius={0}
+                  color="red.500"
+                  _hover={{ bg: "red.50" }}
+                  onClick={onDeletePost}
+                >
+                  Delete post
+                </Button>
+              </>
+            )}
+          </VStack>
+        </Box>
+      </Box>
+    );
+  };
+
   const renderPostHeader = () => {
     return (
       <Box
@@ -226,105 +329,7 @@ function PostComponent({
               )}
             </VStack>
           </HStack>
-
-          <Box position="relative" flexShrink={0}>
-            <IconButton
-              aria-label="More options"
-              icon={<BsThreeDots />}
-              variant="ghost"
-              size="sm"
-              borderRadius="full"
-              color="gray.500"
-              _hover={{
-                bg: "gray.100",
-                color: "gray.700",
-              }}
-              onClick={() => {}} // Placeholder for menu toggle
-            />
-
-            {/* Dropdown Menu */}
-            <Box
-              position="absolute"
-              top="100%"
-              right={0}
-              bg="white"
-              boxShadow="xl"
-              borderRadius="lg"
-              border="1px solid"
-              borderColor="gray.200"
-              minW="180px"
-              py={2}
-              zIndex={10}
-              opacity={0}
-              visibility="hidden"
-              transform="translateY(-8px)"
-              transition="all 0.2s"
-              _groupHover={{
-                opacity: 1,
-                visibility: "visible",
-                transform: "translateY(0)",
-              }}
-            >
-              <VStack spacing={0} align="stretch">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  justifyContent="flex-start"
-                  fontWeight="500"
-                  px={4}
-                  py={3}
-                  borderRadius={0}
-                  _hover={{ bg: "gray.50" }}
-                >
-                  Save post
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  justifyContent="flex-start"
-                  fontWeight="500"
-                  px={4}
-                  py={3}
-                  borderRadius={0}
-                  _hover={{ bg: "gray.50" }}
-                >
-                  Report post
-                </Button>
-                {post?.authorID === userCredential._id && (
-                  <>
-                    <Box as="hr" borderColor="gray.200" />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      fontWeight="500"
-                      px={4}
-                      py={3}
-                      borderRadius={0}
-                      _hover={{ bg: "gray.50" }}
-                      onClick={onOpen}
-                    >
-                      Edit post
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      fontWeight="500"
-                      px={4}
-                      py={3}
-                      borderRadius={0}
-                      color="red.500"
-                      _hover={{ bg: "red.50" }}
-                      onClick={onDeletePost}
-                    >
-                      Delete post
-                    </Button>
-                  </>
-                )}
-              </VStack>
-            </Box>
-          </Box>
+          {renderPostMenu()}
         </Flex>
       </Box>
     );
