@@ -64,15 +64,9 @@ function PostComponent({
   isFullView = false,
   containerProps = {},
 }: PostComponentProps) {
-  const navigate = useNavigate();
   const [copyToClipboard, { value, success }]: any = useCopyToClipboard();
   const { userCredential } = useSelector((store: RootState) => store.auth);
   const [isOpen, onOpen, onClose]: any = useToggle(false);
-  const {
-    isOpen: isModalOpen,
-    onOpen: onModalOpen,
-    onClose: onModalClose,
-  } = useDisclosure();
 
   // State for text expansion and image full screen
   const [expanded, setExpanded] = useState(false);
@@ -96,6 +90,26 @@ function PostComponent({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showMenu]);
+
+  // Close full screen modal with Escape key
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && showFullScreen) {
+        setShowFullScreen(false);
+      }
+    };
+
+    if (showFullScreen) {
+      document.addEventListener("keydown", handleKeyDown);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [showFullScreen]);
 
   const handleLikeToggle = () => {
     if (IsLikedPost) {
@@ -422,8 +436,8 @@ function PostComponent({
             bg="gray.50"
             position="relative"
             w="100%"
-            cursor={showFullScreen ? "zoom-out" : "zoom-in"}
-            onClick={() => setShowFullScreen(!showFullScreen)}
+            cursor="zoom-in"
+            onClick={() => setShowFullScreen(true)}
             transition="transform 0.2s"
             _hover={{ transform: "scale(1.02)" }}
           >
@@ -453,59 +467,83 @@ function PostComponent({
             >
               <IconButton
                 aria-label="View full image"
-                icon={showFullScreen ? <BiCollapse /> : <BiExpand />}
+                icon={<BiExpand />}
                 variant="solid"
                 colorScheme="whiteAlpha"
                 size={{ base: "md", md: "lg" }}
                 borderRadius="full"
                 _hover={{ transform: "scale(1.1)" }}
-              />
-            </Box>
-          </Box>
-        )}
-
-        {/* Full Screen Image Modal */}
-        {showFullScreen && (
-          <Box
-            position="fixed"
-            top={0}
-            left={0}
-            w="100vw"
-            h="100vh"
-            bg="blackAlpha.900"
-            zIndex={1000}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            onClick={() => setShowFullScreen(false)}
-            cursor="zoom-out"
-          >
-            <Box position="relative" maxW="90vw" maxH="90vh" p={4}>
-              <Image
-                src={post.image}
-                alt={post.title || "Post image"}
-                maxW="100%"
-                maxH="100%"
-                objectFit="contain"
-              />
-              <IconButton
-                aria-label="Close full screen"
-                icon={<AiOutlineClose />}
-                position="absolute"
-                top={4}
-                right={4}
-                variant="solid"
-                colorScheme="blackAlpha"
-                size="lg"
-                borderRadius="full"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setShowFullScreen(false);
+                  setShowFullScreen(true);
                 }}
               />
             </Box>
           </Box>
         )}
+      </Box>
+    );
+  };
+
+  // Full Screen Image Modal Component (separate from post content)
+  const renderFullScreenModal = () => {
+    if (!showFullScreen) return null;
+
+    return (
+      <Box
+        position="fixed"
+        top={0}
+        left={0}
+        w="100vw"
+        h="100vh"
+        bg="blackAlpha.900"
+        zIndex={9999}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        onClick={() => setShowFullScreen(false)}
+        cursor="zoom-out"
+        overflow="auto"
+      >
+        <Box
+          position="relative"
+          width="95vw"
+          height="95vh"
+          maxW="95vw"
+          maxH="95vh"
+          p={4}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Image
+            src={post.content}
+            alt={post.title || "Post image"}
+            width="100%"
+            height="100%"
+            objectFit="contain"
+            borderRadius="lg"
+          />
+          <IconButton
+            aria-label="Close full screen"
+            icon={<AiOutlineClose />}
+            position="absolute"
+            top={2}
+            right={2}
+            variant="solid"
+            colorScheme="blackAlpha"
+            size="lg"
+            borderRadius="full"
+            color="white"
+            bg="blackAlpha.700"
+            _hover={{
+              bg: "blackAlpha.800",
+              transform: "scale(1.1)",
+            }}
+            onClick={() => setShowFullScreen(false)}
+          />
+        </Box>
       </Box>
     );
   };
@@ -710,6 +748,8 @@ function PostComponent({
         {renderComments()}
       </Box>
 
+      {/* Render modals outside the main post container */}
+      {renderFullScreenModal()}
       {isOpen && <PostModal mode="update" post={post} onClose={onClose} />}
     </>
   );
