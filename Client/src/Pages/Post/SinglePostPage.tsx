@@ -33,13 +33,6 @@ function SinglePostPage() {
     (store: RootState) => store.auth
   );
 
-  useEffect(() => {
-    fetchPost();
-
-    if (!userCredential._id) return;
-    dispatch(postLikes(userCredential._id));
-  }, []);
-
   const fetchPost = async () => {
     setLoading(true);
     try {
@@ -51,6 +44,14 @@ function SinglePostPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPost();
+
+    if (userCredential._id) {
+      dispatch(postLikes(userCredential._id));
+    }
+  }, [id, userCredential._id]);
 
   const DeletePost = () => {
     if (!userCredential._id) return navigate("/login");
@@ -144,7 +145,7 @@ function SinglePostPage() {
     return { RootComments, Replies };
   }, [post?.comments]);
 
-  if (!post || loading)
+  if (loading || !post._id)
     return (
       <>
         <Navbar />
