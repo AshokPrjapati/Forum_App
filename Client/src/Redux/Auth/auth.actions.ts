@@ -165,7 +165,7 @@ export const sendVerifyEmail =
     }
   };
 
-export const verifyemail =
+export const verifyEmail =
   (credential: string, Toast: Function, navigate: Function) =>
   async (dispatch: Dispatch) => {
     dispatch({ type: Types.AUTH_LOADING });
