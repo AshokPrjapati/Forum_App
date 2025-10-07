@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "forum-app-6dad7"
-  }
+    "default": "forumapp-120fb",
+    "forum-app": "forum-app-6dad7"
+  },
+  "targets": {},
+  "etags": {}
 }

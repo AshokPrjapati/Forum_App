@@ -1,6 +1,5 @@
 # Forum_App
 
-
 <h2 align="center">Forum is a social networking site designed specifically for the social connectivity and business community.</h2>
 
 <br />
@@ -15,15 +14,16 @@
   <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="chakra-ui"/>
   <img src="https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white" alt="chakra-ui"/>
 </p>
-<h3 align="center"><a href="https://forumapp-120fb.web.app/"><strong>Want to see live preview »</strong></a></h3>
+<h3 align="center"><a href="https://forum-app-6dad7.web.app/"><strong>Want to see live preview »</strong></a></h3>
 
 ## 🚀 Features
+
 - Sign Up/Login authentication made with Firebase and Sign in with Google Funtionality.
 - Profile Page with searching, creating functionality.
 - Post can edited deleted and shared.
 - Watch Followers and Following of the User.
 - Admin can track the particular user activity through admin panel.
-<br />
+  <br />
 
 ### In this project we have
 
@@ -48,6 +48,7 @@
 ![Checkout](https://github.com/Saurav903/sample1/blob/main/follow.png)
 
 # 6. Admin Dashboard
+
 <strong>Admin details to login </strong>
 
 ![Admin](https://github.com/Saurav903/sample1/blob/main/Image20230227112913.png)
