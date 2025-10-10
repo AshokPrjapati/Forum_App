@@ -159,8 +159,6 @@ async function sentVerificationEmail(req, res) {
 
   try {
     const transporter = nodemailer.createTransport({
-      port: 587,
-      secure: false,
       service: "gmail",
       auth: {
         user: process.env.EMAIL,
