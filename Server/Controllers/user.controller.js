@@ -185,15 +185,17 @@ async function sentVerificationEmail(req, res) {
 
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
+        console.log("Here 1", err);
         res
           .status(403)
           .json({ message: "Please try again. after some time", err });
       } else {
+        console.log("Here 2");
         console.log("email sent: ", info);
         res.status(201).json({ status: 201, info });
       }
     });
-
+    console.log("Here 3");
     res.status(201).json({ status: 200, EncryptedCredential });
   } catch (error) {
     console.log("error: ", error);
