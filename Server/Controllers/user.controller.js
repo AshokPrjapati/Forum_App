@@ -183,7 +183,14 @@ async function sentVerificationEmail(req, res) {
       html: Email_template(process.env.EMAIL_REDIRECT_URL, EncryptedCredential),
     };
 
-    transporter.sendMail(mailOptions);
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log("error", err);
+      } else {
+        console.log("email sent: ", info);
+      }
+    });
+    console.log("request sentVerificationEmail is done");
     res.status(201).json({ status: 200, EncryptedCredential });
   } catch (error) {
     console.log("error: ", error);
