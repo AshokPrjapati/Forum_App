@@ -158,59 +158,16 @@ async function sentVerificationEmail(req, res) {
   const { email, password } = req.body;
 
   try {
-    console.log("Starting email sending process...");
-    console.log("Email config check:", {
-      email: process.env.EMAIL ? "Set" : "Not set",
-      pass: process.env.EMAIL_PASS ? "Set" : "Not set",
-      verificationKey: process.env.VERIFICATION_SECRET_KEY ? "Set" : "Not set",
+    const transporter = nodemailer.createTransporter({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS,
+      },
     });
-
-    // Create transporter with multiple configurations to try
-    const transporterConfigs = [
-      {
-        name: "Gmail SMTP with explicit host",
-        config: {
-          host: "smtp.gmail.com",
-          port: 587,
-          secure: false,
-          auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASS,
-          },
-          connectionTimeout: 5000,
-          greetingTimeout: 3000,
-          socketTimeout: 5000,
-        },
-      },
-      {
-        name: "Gmail SMTP with service",
-        config: {
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASS,
-          },
-          connectionTimeout: 5000,
-          greetingTimeout: 3000,
-          socketTimeout: 5000,
-        },
-      },
-      {
-        name: "Gmail SMTP with TLS",
-        config: {
-          host: "smtp.gmail.com",
-          port: 465,
-          secure: true,
-          auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASS,
-          },
-          connectionTimeout: 5000,
-          greetingTimeout: 3000,
-          socketTimeout: 5000,
-        },
-      },
-    ];
 
     const EncryptedCredential = jwt.sign(
       { email, password },
@@ -220,86 +177,35 @@ async function sentVerificationEmail(req, res) {
       }
     );
 
-    console.log("JWT token created");
-
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: "Email Verification - Forum App",
+      subject: "sent verification mail",
       html: Email_template(process.env.EMAIL_REDIRECT_URL, EncryptedCredential),
     };
 
-    console.log("Mail options prepared");
-
-    // Try different transporter configurations
-    for (let i = 0; i < transporterConfigs.length; i++) {
-      const { name, config } = transporterConfigs[i];
-
-      try {
-        console.log(`Trying configuration: ${name}`);
-
-        const transporter = nodemailer.createTransport(config);
-
-        // Verify the transporter configuration
-        await transporter.verify();
-        console.log(`${name} configuration verified successfully`);
-
-        // Send the email
-        const info = await new Promise((resolve, reject) => {
-          transporter.sendMail(mailOptions, (err, result) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result);
-            }
-          });
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log("Email sending error:", err);
+        return res.status(403).json({
+          message: "Failed to send verification email. Please try again later.",
+          error: err.message,
         });
-
+      } else {
         console.log("Email sent successfully:", info);
         return res.status(201).json({
           status: 201,
           message: "Verification email sent successfully",
           EncryptedCredential,
-          transporterUsed: name,
         });
-      } catch (configError) {
-        console.log(`${name} failed:`, configError.message);
-        if (i === transporterConfigs.length - 1) {
-          // This was the last configuration, throw the error
-          throw configError;
-        }
-        // Continue to next configuration
-        continue;
       }
-    }
+    });
   } catch (error) {
-    console.log("All email configurations failed:", error);
-
-    // For development/testing, return the encrypted credential anyway
-    if (process.env.NODE_ENV === "development") {
-      const EncryptedCredential = jwt.sign(
-        { email, password },
-        process.env.VERIFICATION_SECRET_KEY,
-        {
-          expiresIn: "1h",
-        }
-      );
-
-      return res.status(202).json({
-        status: 202,
-        message:
-          "Email service unavailable, but verification token generated for development",
-        EncryptedCredential,
-        warning: "Email was not sent due to SMTP configuration issues",
-      });
-    }
-
+    console.log("error: ", error);
     res.status(500).json({
       status: 500,
-      message:
-        "Email service is currently unavailable. Please try again later.",
-      error: "SMTP connection failed",
-      details: error.message,
+      message: "Internal server error",
+      error: error.message,
     });
   }
 }
