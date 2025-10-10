@@ -190,11 +190,9 @@ async function sentVerificationEmail(req, res) {
           .status(403)
           .json({ message: "Please try again. after some time", err });
       } else {
-        res.status(201).json({ status: 201, info });
+        res.status(201).json({ status: 201, info, EncryptedCredential });
       }
     });
-
-    res.status(201).json({ status: 200, EncryptedCredential });
   } catch (error) {
     console.log("error: ", error);
     res.send(error);
