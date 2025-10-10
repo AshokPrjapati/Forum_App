@@ -158,23 +158,14 @@ async function sentVerificationEmail(req, res) {
   const { email, password } = req.body;
 
   try {
-    // const transporter = nodemailer.createTransporter({
-    //   host: "smtp.gmail.com",
-    //   port: 587,
-    //   secure: false,
-    //   service: "gmail",
-    //   auth: {
-    //     user: process.env.EMAIL,
-    //     pass: process.env.EMAIL_PASS,
-    //   },
-    // });
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp.sendgrid.net",
+    const transporter = nodemailer.createTransporter({
+      host: "smtp.gmail.com",
       port: 587,
+      secure: false,
+      service: "gmail",
       auth: {
-        user: "apikey",
-        pass: process.env.SENDGRID_API_KEY,
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
