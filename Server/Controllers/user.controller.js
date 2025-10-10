@@ -158,13 +158,28 @@ async function sentVerificationEmail(req, res) {
   const { email, password } = req.body;
 
   try {
+    console.log("Starting email sending process...");
+    console.log("Email config check:", {
+      email: process.env.EMAIL ? "Set" : "Not set",
+      pass: process.env.EMAIL_PASS ? "Set" : "Not set",
+      verificationKey: process.env.VERIFICATION_SECRET_KEY ? "Set" : "Not set",
+    });
+
     const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       service: "gmail",
       auth: {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASS,
       },
+      connectionTimeout: 10000,
+      greetingTimeout: 5000,
+      socketTimeout: 10000,
     });
+
+    console.log("Transporter created successfully");
 
     const EncryptedCredential = jwt.sign(
       { email, password },
@@ -174,6 +189,8 @@ async function sentVerificationEmail(req, res) {
       }
     );
 
+    console.log("JWT token created");
+
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
@@ -181,18 +198,34 @@ async function sentVerificationEmail(req, res) {
       html: Email_template(process.env.EMAIL_REDIRECT_URL, EncryptedCredential),
     };
 
+    console.log("Mail options prepared, attempting to send email...");
+
     transporter.sendMail(mailOptions, (err, info) => {
+      console.log("SendMail callback executed");
       if (err) {
-        console.log("error", err);
+        console.log("Email sending error:", err);
+        return res.status(403).json({
+          message: "Failed to send verification email. Please try again later.",
+          error: err.message,
+        });
       } else {
-        console.log("email sent: ", info);
+        console.log("Email sent successfully:", info);
+        return res.status(201).json({
+          status: 201,
+          message: "Verification email sent successfully",
+          EncryptedCredential,
+        });
       }
     });
-    console.log("request sentVerificationEmail is done");
-    res.status(201).json({ status: 200, EncryptedCredential });
+
+    console.log("SendMail function called, waiting for callback...");
   } catch (error) {
-    console.log("error: ", error);
-    res.send(error);
+    console.log("Catch block error: ", error);
+    res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 }
 
